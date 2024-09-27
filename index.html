@@ -1,0 +1,53 @@
+<html>
+
+<head>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+
+<body>
+  <div id="graph_1"> </div>
+  <script>
+    // sets dimensions
+    // const svg = d3.select('svg#scatterplot');
+    // const width = svg.attr("width")
+    // const 
+    var margin = { top: 10, right: 20, bottom: 50, left: 50 },
+      width = 1000 - margin.left - margin.right,
+      height = 1000 - margin.top - margin.bottom;
+
+    // appends svg
+    var svg = d3.select("#graph_1")
+      // .append("svg")
+      // .attr("width", width + margin.left + margin.right)
+      // .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    let country_dict = {
+      "China": 0,
+      "Ethiopia": 0,
+      "Russia": 0,
+      "Mali": 0,
+      "Brazil": 0,
+      "Norway": 0,
+      "Qatar": 0,
+      "Kuwait": 0,
+      "Bangladesh": 0
+    };
+
+    let year_dict = { "1994": 0, "2022": 0, "2008": 0 };
+    data = data.filter(d => {
+      return d['Country'] in country_dict && d['Year'] in year_dict;
+    });
+
+
+    // creates legend
+
+    //d3.csv()
+
+  </script>
+
+
+</body>
+
+</html>
