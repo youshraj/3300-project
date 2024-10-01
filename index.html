@@ -12,84 +12,95 @@
 
 <body>
   <div id="num1"> </div>
-  <svg id="graph1" height="500" width="1000" style="margin-top:50px" ></svg>
+  <svg id="graph1" height="500" width="1000" style="margin-top:50px"></svg>
   <script>
     const svg = d3.select('svg#graph1');
     const width = svg.attr('width');
     const height = svg.attr('height');
-    const margins = {top: 10, right: 20, bottom: 50, left: 100};
+    const margins = { top: 70, right: 20, bottom: 80, left: 100 };
     const chartWidth = width - margins.left - margins.right;
     const chartHeight = height - margins.top - margins.bottom;
 
     // appends svg
     let chartArea = svg.append('g')
-                      .attr('transform',`translate(${margins.left},${margins.top})`);
+      .attr('transform', `translate(${margins.left},${margins.top})`);
 
-    d3.csv('heat-death-rate-vs-co2.csv').then( (data) => {
+    d3.csv('heat-death-rate-vs-co2.csv').then((data) => {
       const countries = ["China", "South Africa", "Mongolia", "Ukraine", "Venezuela", "Norway",
-      "Qatar", "Bahrain", "Turkey", "United States"];
+        "Qatar", "Bahrain", "Turkey", "United States"];
       countries.sort().reverse();
 
-      const years = [ "1960", "2022", "2000" ];
-   
+      const years = ["1960", "2000", "2022"];
+
       // filter
       //console.log(data);
       data = data.filter((d) => {
         return countries.includes(d['Entity']) && years.includes(d['Year']);
-      }); 
-      data.forEach( (d, i) => {
+      });
+      data.forEach((d, i) => {
         d['Annual CO2 emissions (per capita)'] = Number(d['Annual CO2 emissions (per capita)']);
       });
-  
+
       console.log(data)
-      const emissionsExtent = d3.extent(data, d => d['Annual CO2 emissions (per capita)'] );
+      const emissionsExtent = d3.extent(data, d => d['Annual CO2 emissions (per capita)']);
 
       const xScale = d3.scaleLinear().domain(emissionsExtent)
-                                     .range([0, chartWidth]);
+        .range([0, chartWidth]);
       const yScale = d3.scaleBand().domain(countries)
-                                  .range([chartHeight, 0])
-                                  
+        .range([chartHeight, 0])
+
 
       // Axes
       let leftAxis = d3.axisLeft(yScale);
       svg.append("g")
-         .attr("class", "y axis")
-         .attr("transform", `translate(${margins.left - 10}, ${margins.top})`)
-         .call(leftAxis);
-      
+        .attr("class", "y axis")
+        .attr("transform", `translate(${margins.left - 10}, ${margins.top})`)
+        .call(leftAxis);
+
       let bottomAxis = d3.axisBottom(xScale);
       svg.append("g")
-         .attr("class", "x axis")
-         .attr("transform", `translate(${margins.left}, ${margins.top + chartHeight + 10})`)
-         .call(bottomAxis);
-      
+        .attr("class", "x axis")
+        .attr("transform", `translate(${margins.left}, ${margins.top + chartHeight + 10})`)
+        .call(bottomAxis);
+
       let chartArea = svg.append('g')
-                         .attr('transform',`translate(${margins.left},${margins.top})`);
-      
+        .attr('transform', `translate(${margins.left},${margins.top})`);
+
       let yearExtent = d3.extent(years)
       let colorScale = d3.scaleLinear().domain(yearExtent)
-                                       .range([d3.rgb("#FCF55F"), d3.rgb("#ff0000")])
-                                       .interpolate(d3.interpolateHcl);
+        .range([d3.rgb("#FCF55F"), d3.rgb("#ff0000")])
+        .interpolate(d3.interpolateHcl);
       //svg.selectAll("circle").data(data)
-        //            .join("circle") 
-          //          .attr("r", 10)
-            //        .attr("fill", d => colorScale(d['Year']) )
-              //      .attr("cx", d => xScale(d['Annual CO2 emissions (per capita)']) )
-                //    .attr("cy", d => yScale(d['Entity']) );
+      //            .join("circle") 
+      //          .attr("r", 10)
+      //        .attr("fill", d => colorScale(d['Year']) )
+      //      .attr("cx", d => xScale(d['Annual CO2 emissions (per capita)']) )
+      //    .attr("cy", d => yScale(d['Entity']) );
       // 
 
-      
 
-      data.forEach( (d, i) => {
+
+      data.forEach((d, i) => {
         chartArea.append('circle')
-            .attr('cx', xScale(d['Annual CO2 emissions (per capita)']))
-            .attr('cy', yScale(d['Entity']))
-            .attr('r', 5)
-            .attr("fill",  colorScale(d['Year']) )
-            .attr('opacity', 0.8)
-            .attr('stroke', "darkred")
+          .attr('cx', xScale(d['Annual CO2 emissions (per capita)']))
+          .attr('cy', yScale(d['Entity']))
+          .attr('r', 5)
+          .attr("fill", colorScale(d['Year']))
+          .attr('opacity', 0.8)
+          .attr('stroke', "darkred")
       });
     })
+
+    // x-axis labels
+    svg.append("text").text("Annual Carbon Dioxide Emission (per capita)").attr("x", 250).attr("y", 500).style("font-size", "15px");
+
+    // y-axis labels
+    svg.append("text").text("Countries").attr("x", 50).attr("y", 200).style("font-size", "15px").attr("transform", "rotate(-90, 50, 200)");
+
+    //title
+    svg.append("text").text("Carbon Dioxide emmision over time (per capita)").attr("x", 200).attr("y", 10).style("font-size", "17px");
+
+
 
   </script>
 
