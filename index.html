@@ -8,26 +8,42 @@
     font-family: "Verdana";
 
   }
+
+  .legend span {
+    margin-right: 10px;
+  }
+    
+  .gridlines line {
+    stroke: #bbb;
+  }
+  
+  .gridlines .domain {
+    stroke: none;
+  }
 </style>
 
 <body>
   <div id="num1"> </div>
-  <svg id="graph1" height="500" width="1000" style="margin-top:50px"></svg>
+  <svg id="graph1" height="500" width="1000" style="margin-top:50px; background:cornsilk; border:1px solid black; font-family:Roboto"></svg>
   <script>
-    const svg = d3.select('svg#graph1');
-    const width = svg.attr('width');
-    const height = svg.attr('height');
-    const margins = { top: 70, right: 20, bottom: 80, left: 100 };
+    const svg2 = d3.select('svg#graph1');
+    const width = svg2.attr('width');
+    const height = svg2.attr('height');
+    const margins = { top: 150, right: 40, bottom: 60, left: 140 };
     const chartWidth = width - margins.left - margins.right;
     const chartHeight = height - margins.top - margins.bottom;
 
     // appends svg
-    let chartArea = svg.append('g')
+    let chartArea = svg2.append('g')
       .attr('transform', `translate(${margins.left},${margins.top})`);
 
+
+    const zoneColors = ["#9fdfbc", "#fff099", "#ffb3b3"];
+    const zones = ["Goal Zone", "Warning Zone", "Danger Zone"];
+
     d3.csv('heat-death-rate-vs-co2.csv').then((data) => {
-      const countries = ["China", "South Africa", "Mongolia", "Ukraine", "Venezuela", "Norway",
-        "Qatar", "Bahrain", "Turkey", "United States"];
+      const countries = ["China", "South Africa", "Australia", "United Arab Emirates", "Venezuela", "Norway",
+        "Qatar", "Bahrain", "South Korea", "United States"];
       countries.sort().reverse();
 
       const years = ["1960", "2000", "2022"];
@@ -42,64 +58,160 @@
       });
 
       console.log(data)
+
+      // Scales
       const emissionsExtent = d3.extent(data, d => d['Annual CO2 emissions (per capita)']);
 
       const xScale = d3.scaleLinear().domain(emissionsExtent)
         .range([0, chartWidth]);
-      const yScale = d3.scaleBand().domain(countries)
-        .range([chartHeight, 0])
+      
+      const yScale = d3.scaleLinear().domain([1,10]).range([chartHeight, 0])
+      let yAxis = [];
+      for (i=1; i<=10; i++) {
+        yAxis.push(yScale(i))
+      }
 
+      const countryScale = d3.scaleOrdinal().domain(countries)
+        .range(yAxis)
+
+      let safeWidth = xScale(2.3); // 2.3 tons found on iea.org as the emissions goal for 2030
+      let warningWidth = xScale(6.3) - safeWidth; // 6.3 tons found on Enerdata website
+      let dangerWidth = xScale(emissionsExtent[1]) - warningWidth - safeWidth;
+      
+      // good zone
+      svg2.append('rect')
+          .attr("x", margins.left-10)
+          .attr("y", margins.top - 10)
+          .attr("width", safeWidth + 10) 
+          .attr("height", chartHeight + 20)
+          .style("fill", zoneColors[0])
+          .style("stroke", "none");
+
+      // warning zone
+      svg2.append('rect')
+          .attr("x", margins.left + safeWidth)
+          .attr("y", margins.top - 10)
+          .attr("width", warningWidth ) 
+          .attr("height", chartHeight + 20)
+          .style("fill", zoneColors[1])
+          .style("stroke", "none");
+
+      // danger zone
+      svg2.append('rect')
+          .attr("x", margins.left + safeWidth + warningWidth)
+          .attr("y", margins.top - 10)
+          .attr("width", dangerWidth + 10)
+          .attr("height", chartHeight + 20)
+          .style("fill", zoneColors[2]) 
+          .style("stroke", "none");
 
       // Axes
-      let leftAxis = d3.axisLeft(yScale);
-      svg.append("g")
+      let leftAxis = d3.axisLeft(countryScale);
+      svg2.append("g")
         .attr("class", "y axis")
         .attr("transform", `translate(${margins.left - 10}, ${margins.top})`)
+        .style("font-size", "11px")
+        .style("font-family", "Roboto")
         .call(leftAxis);
 
       let bottomAxis = d3.axisBottom(xScale);
-      svg.append("g")
+      svg2.append("g")
         .attr("class", "x axis")
         .attr("transform", `translate(${margins.left}, ${margins.top + chartHeight + 10})`)
+        .style("font-size", "11px")
+        .style("font-family", "Roboto")
         .call(bottomAxis);
 
-      let chartArea = svg.append('g')
+      let chartArea = svg2.append('g')
         .attr('transform', `translate(${margins.left},${margins.top})`);
 
       let yearExtent = d3.extent(years)
       let colorScale = d3.scaleLinear().domain(yearExtent)
-        .range([d3.rgb("#FCF55F"), d3.rgb("#ff0000")])
-        .interpolate(d3.interpolateHcl);
-      //svg.selectAll("circle").data(data)
-      //            .join("circle") 
-      //          .attr("r", 10)
-      //        .attr("fill", d => colorScale(d['Year']) )
-      //      .attr("cx", d => xScale(d['Annual CO2 emissions (per capita)']) )
-      //    .attr("cy", d => yScale(d['Entity']) );
-      // 
+                         .range([d3.rgb("#FCF55F"), d3.rgb("#ff0000")])
+                         .interpolate(d3.interpolateHcl);
 
+      // lines connecting data points
+      for (i=0; i<30; i=i+3) {
+        console.log(data)
+        lineExtent = d3.extent([data[i]['Annual CO2 emissions (per capita)'], 
+                                data[i+1]['Annual CO2 emissions (per capita)'], 
+                                data[i+2]['Annual CO2 emissions (per capita)']]);
+        console.log(lineExtent)
+        svg2.append("line")
+            .attr("x1", xScale(lineExtent[0]))
+            .attr("x2", xScale(lineExtent[1]))
+            .attr("y1", countryScale(data[i].Entity))
+            .attr("y2", countryScale(data[i].Entity))
+            .style("stroke", "darkred")
+            .style("stroke-width", 2);
+      }
 
-
+      // plotting data
       data.forEach((d, i) => {
         chartArea.append('circle')
           .attr('cx', xScale(d['Annual CO2 emissions (per capita)']))
-          .attr('cy', yScale(d['Entity']))
+          .attr('cy', countryScale(d['Entity']))
           .attr('r', 5)
           .attr("fill", colorScale(d['Year']))
           .attr('opacity', 0.8)
           .attr('stroke', "darkred")
+          .attr('stroke-width', 2)
       });
-    })
 
+      marginScale = d3.scaleLinear()
+                      .domain([0,2])
+                    .range([30, margins.top - 50]);
+      // legend
+      for (i=0; i<3; i++) {
+        console.log(zoneColors[i]);
+        svg2.append('rect')
+            .attr("x", width - 150)
+            .attr("y", marginScale(i))
+            .attr("width", 20)
+            .attr("height", 20)
+            .style("fill", zoneColors[i])
+            .style("stroke", "black");
+        svg2.append('text')
+            .attr("x", width - 120)
+            .attr("y", marginScale(i) + 10)
+            .attr("dominant-baseline", "middle")
+            .text(zones[i])
+            .style("fill", "black")
+            .style("font-family", "Courier")
+            .style("font-size", 13);
+        svg2.append('circle')
+            .attr('cx', width - 250)
+            .attr('cy', marginScale(i) + 10)
+            .attr('r', 10)
+            .attr("fill", colorScale(years[i]))
+            .attr('opacity', 0.8)
+            .attr('stroke', "darkred")
+            .attr('stroke-width', 2)
+        svg2.append('text')
+            .attr("x", width - 230)
+            .attr("y", marginScale(i) + 10)
+            .attr("dominant-baseline", "middle")
+            .text(years[i])
+            .style("fill", "black")
+            .style("font-family", "Courier")
+            .style("font-size", 13);
+      }
+    })
+    
+    
+    
+
+      
     // x-axis labels
-    svg.append("text").text("Annual Carbon Dioxide Emission (per capita)").attr("x", 250).attr("y", 500).style("font-size", "15px");
+    svg2.append("text").text("Annual Carbon Dioxide Emissions (tons per capita)").attr("x", chartWidth/2).attr("y", 485).style("font-size", "15px");
 
     // y-axis labels
-    svg.append("text").text("Countries").attr("x", 50).attr("y", 200).style("font-size", "15px").attr("transform", "rotate(-90, 50, 200)");
+    svg2.append("text").text("Countries").attr("x", -70).attr("y", 185).style("font-size", "15px").attr("transform", "rotate(-90, 50, 200)");
 
     //title
-    svg.append("text").text("Carbon Dioxide emmision over time (per capita)").attr("x", 200).attr("y", 10).style("font-size", "17px");
+    svg2.append("text").text("Carbon Dioxide Emissions Over Time").attr("x", 50).attr("y", 25).style("font-size", "17px");
 
+    // Legend
 
 
   </script>
