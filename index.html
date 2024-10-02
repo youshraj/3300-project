@@ -12,11 +12,11 @@
   .legend span {
     margin-right: 10px;
   }
-    
+
   .gridlines line {
     stroke: #bbb;
   }
-  
+
   .gridlines .domain {
     stroke: none;
   }
@@ -24,7 +24,8 @@
 
 <body>
   <div id="num1"> </div>
-  <svg id="graph1" height="500" width="1000" style="margin-top:50px; background:cornsilk; border:1px solid black; font-family:Roboto"></svg>
+  <svg id="graph1" height="500" width="1000"
+    style="margin-top:50px; background:cornsilk; border:1px solid black; font-family:Roboto"></svg>
   <script>
     const svg2 = d3.select('svg#graph1');
     const width = svg2.attr('width');
@@ -64,10 +65,10 @@
 
       const xScale = d3.scaleLinear().domain(emissionsExtent)
         .range([0, chartWidth]);
-      
-      const yScale = d3.scaleLinear().domain([1,10]).range([chartHeight, 0])
+
+      const yScale = d3.scaleLinear().domain([1, 10]).range([chartHeight, 0])
       let yAxis = [];
-      for (i=1; i<=10; i++) {
+      for (i = 1; i <= 10; i++) {
         yAxis.push(yScale(i))
       }
 
@@ -77,33 +78,33 @@
       let safeWidth = xScale(2.3); // 2.3 tons found on iea.org as the emissions goal for 2030
       let warningWidth = xScale(6.3) - safeWidth; // 6.3 tons found on Enerdata website
       let dangerWidth = xScale(emissionsExtent[1]) - warningWidth - safeWidth;
-      
+
       // good zone
       svg2.append('rect')
-          .attr("x", margins.left-10)
-          .attr("y", margins.top - 10)
-          .attr("width", safeWidth + 10) 
-          .attr("height", chartHeight + 20)
-          .style("fill", zoneColors[0])
-          .style("stroke", "none");
+        .attr("x", margins.left - 10)
+        .attr("y", margins.top - 10)
+        .attr("width", safeWidth + 10)
+        .attr("height", chartHeight + 20)
+        .style("fill", zoneColors[0])
+        .style("stroke", "none");
 
       // warning zone
       svg2.append('rect')
-          .attr("x", margins.left + safeWidth)
-          .attr("y", margins.top - 10)
-          .attr("width", warningWidth ) 
-          .attr("height", chartHeight + 20)
-          .style("fill", zoneColors[1])
-          .style("stroke", "none");
+        .attr("x", margins.left + safeWidth)
+        .attr("y", margins.top - 10)
+        .attr("width", warningWidth)
+        .attr("height", chartHeight + 20)
+        .style("fill", zoneColors[1])
+        .style("stroke", "none");
 
       // danger zone
       svg2.append('rect')
-          .attr("x", margins.left + safeWidth + warningWidth)
-          .attr("y", margins.top - 10)
-          .attr("width", dangerWidth + 10)
-          .attr("height", chartHeight + 20)
-          .style("fill", zoneColors[2]) 
-          .style("stroke", "none");
+        .attr("x", margins.left + safeWidth + warningWidth)
+        .attr("y", margins.top - 10)
+        .attr("width", dangerWidth + 10)
+        .attr("height", chartHeight + 20)
+        .style("fill", zoneColors[2])
+        .style("stroke", "none");
 
       // Axes
       let leftAxis = d3.axisLeft(countryScale);
@@ -127,23 +128,23 @@
 
       let yearExtent = d3.extent(years)
       let colorScale = d3.scaleLinear().domain(yearExtent)
-                         .range([d3.rgb("#FCF55F"), d3.rgb("#ff0000")])
-                         .interpolate(d3.interpolateHcl);
+        .range([d3.rgb("#FCF55F"), d3.rgb("#ff0000")])
+        .interpolate(d3.interpolateHcl);
 
       // lines connecting data points
-      for (i=0; i<30; i=i+3) {
+      for (i = 0; i < 30; i = i + 3) {
         console.log(data)
-        lineExtent = d3.extent([data[i]['Annual CO2 emissions (per capita)'], 
-                                data[i+1]['Annual CO2 emissions (per capita)'], 
-                                data[i+2]['Annual CO2 emissions (per capita)']]);
+        lineExtent = d3.extent([data[i]['Annual CO2 emissions (per capita)'],
+        data[i + 1]['Annual CO2 emissions (per capita)'],
+        data[i + 2]['Annual CO2 emissions (per capita)']]);
         console.log(lineExtent)
-        svg2.append("line")
-            .attr("x1", xScale(lineExtent[0]))
-            .attr("x2", xScale(lineExtent[1]))
-            .attr("y1", countryScale(data[i].Entity))
-            .attr("y2", countryScale(data[i].Entity))
-            .style("stroke", "darkred")
-            .style("stroke-width", 2);
+        chartArea.append("line")
+          .attr("x1", xScale(lineExtent[0]))
+          .attr("x2", xScale(lineExtent[1]))
+          .attr("y1", countryScale(data[i].Entity))
+          .attr("y2", countryScale(data[i].Entity))
+          .style("stroke", "darkred")
+          .style("stroke-width", 2);
       }
 
       // plotting data
@@ -153,57 +154,57 @@
           .attr('cy', countryScale(d['Entity']))
           .attr('r', 5)
           .attr("fill", colorScale(d['Year']))
-          .attr('opacity', 0.8)
+          .attr('opacity', 1)
           .attr('stroke', "darkred")
           .attr('stroke-width', 2)
       });
 
       marginScale = d3.scaleLinear()
-                      .domain([0,2])
-                    .range([30, margins.top - 50]);
+        .domain([0, 2])
+        .range([30, margins.top - 50]);
       // legend
-      for (i=0; i<3; i++) {
+      for (i = 0; i < 3; i++) {
         console.log(zoneColors[i]);
         svg2.append('rect')
-            .attr("x", width - 150)
-            .attr("y", marginScale(i))
-            .attr("width", 20)
-            .attr("height", 20)
-            .style("fill", zoneColors[i])
-            .style("stroke", "black");
+          .attr("x", width - 150)
+          .attr("y", marginScale(i))
+          .attr("width", 20)
+          .attr("height", 20)
+          .style("fill", zoneColors[i])
+          .style("stroke", "black");
         svg2.append('text')
-            .attr("x", width - 120)
-            .attr("y", marginScale(i) + 10)
-            .attr("dominant-baseline", "middle")
-            .text(zones[i])
-            .style("fill", "black")
-            .style("font-family", "Courier")
-            .style("font-size", 13);
+          .attr("x", width - 120)
+          .attr("y", marginScale(i) + 10)
+          .attr("dominant-baseline", "middle")
+          .text(zones[i])
+          .style("fill", "black")
+          .style("font-family", "Courier")
+          .style("font-size", 13);
         svg2.append('circle')
-            .attr('cx', width - 250)
-            .attr('cy', marginScale(i) + 10)
-            .attr('r', 10)
-            .attr("fill", colorScale(years[i]))
-            .attr('opacity', 0.8)
-            .attr('stroke', "darkred")
-            .attr('stroke-width', 2)
+          .attr('cx', width - 250)
+          .attr('cy', marginScale(i) + 10)
+          .attr('r', 10)
+          .attr("fill", colorScale(years[i]))
+          .attr('opacity', 0.8)
+          .attr('stroke', "darkred")
+          .attr('stroke-width', 2)
         svg2.append('text')
-            .attr("x", width - 230)
-            .attr("y", marginScale(i) + 10)
-            .attr("dominant-baseline", "middle")
-            .text(years[i])
-            .style("fill", "black")
-            .style("font-family", "Courier")
-            .style("font-size", 13);
+          .attr("x", width - 230)
+          .attr("y", marginScale(i) + 10)
+          .attr("dominant-baseline", "middle")
+          .text(years[i])
+          .style("fill", "black")
+          .style("font-family", "Courier")
+          .style("font-size", 13);
       }
     })
-    
-    
-    
 
-      
+
+
+
+
     // x-axis labels
-    svg2.append("text").text("Annual Carbon Dioxide Emissions (tons per capita)").attr("x", chartWidth/2).attr("y", 485).style("font-size", "15px");
+    svg2.append("text").text("Annual Carbon Dioxide Emissions (tons per capita)").attr("x", chartWidth / 2).attr("y", 485).style("font-size", "15px");
 
     // y-axis labels
     svg2.append("text").text("Countries").attr("x", -70).attr("y", 185).style("font-size", "15px").attr("transform", "rotate(-90, 50, 200)");
