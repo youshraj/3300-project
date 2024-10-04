@@ -14,7 +14,8 @@
   }
 
   .gridlines line {
-    stroke: #bbb;
+    stroke: rgb(167, 159, 180);
+    stroke-width: 1px;
   }
 
   .gridlines .domain {
@@ -26,31 +27,34 @@
   <div id="num1"> </div>
   <svg id="graph1" height="500" width="1000"
     style="margin-top:50px; background:cornsilk; border:1px solid black; font-family:Roboto"></svg>
+  <svg id="graph2" height="780" width="1000"
+    style="margin-top:50px; background:rgb(166, 191, 239); border:1px solid black; font-family:Roboto"></svg>
+  
   <script>
-    const svg2 = d3.select('svg#graph1');
-    const width = svg2.attr('width');
-    const height = svg2.attr('height');
+    // both visualizations
+    const countries = ["China", "South Africa", "Australia", "United Arab Emirates", "Venezuela", "Norway",
+        "Qatar", "Bahrain", "South Korea", "United States"];
+      countries.sort().reverse();
+      
+    // visualization 1
+    const svg1 = d3.select('svg#graph1');
+    const width = svg1.attr('width');
+    const height = svg1.attr('height');
     const margins = { top: 150, right: 40, bottom: 60, left: 140 };
     const chartWidth = width - margins.left - margins.right;
     const chartHeight = height - margins.top - margins.bottom;
 
-    // appends svg
-    let chartArea = svg2.append('g')
+    // append svg
+    let chartArea = svg1.append('g')
       .attr('transform', `translate(${margins.left},${margins.top})`);
-
 
     const zoneColors = ["#9fdfbc", "#fff099", "#ffb3b3"];
     const zones = ["Goal Zone", "Warning Zone", "Danger Zone"];
 
-    d3.csv('heat-death-rate-vs-co2.csv').then((data) => {
-      const countries = ["China", "South Africa", "Australia", "United Arab Emirates", "Venezuela", "Norway",
-        "Qatar", "Bahrain", "South Korea", "United States"];
-      countries.sort().reverse();
-
+    d3.csv('co2-emissions.csv').then((data) => {
       const years = ["1960", "2000", "2022"];
 
       // filter
-      //console.log(data);
       data = data.filter((d) => {
         return countries.includes(d['Entity']) && years.includes(d['Year']);
       });
@@ -62,7 +66,6 @@
 
       // Scales
       const emissionsExtent = d3.extent(data, d => d['Annual CO2 emissions (per capita)']);
-
       const xScale = d3.scaleLinear().domain(emissionsExtent)
         .range([0, chartWidth]);
 
@@ -80,7 +83,7 @@
       let dangerWidth = xScale(emissionsExtent[1]) - warningWidth - safeWidth;
 
       // good zone
-      svg2.append('rect')
+      svg1.append('rect')
         .attr("x", margins.left - 10)
         .attr("y", margins.top - 10)
         .attr("width", safeWidth + 10)
@@ -89,7 +92,7 @@
         .style("stroke", "none");
 
       // warning zone
-      svg2.append('rect')
+      svg1.append('rect')
         .attr("x", margins.left + safeWidth)
         .attr("y", margins.top - 10)
         .attr("width", warningWidth)
@@ -98,7 +101,7 @@
         .style("stroke", "none");
 
       // danger zone
-      svg2.append('rect')
+      svg1.append('rect')
         .attr("x", margins.left + safeWidth + warningWidth)
         .attr("y", margins.top - 10)
         .attr("width", dangerWidth + 10)
@@ -108,7 +111,7 @@
 
       // Axes
       let leftAxis = d3.axisLeft(countryScale);
-      svg2.append("g")
+      svg1.append("g")
         .attr("class", "y axis")
         .attr("transform", `translate(${margins.left - 10}, ${margins.top})`)
         .style("font-size", "11px")
@@ -116,14 +119,14 @@
         .call(leftAxis);
 
       let bottomAxis = d3.axisBottom(xScale);
-      svg2.append("g")
+      svg1.append("g")
         .attr("class", "x axis")
         .attr("transform", `translate(${margins.left}, ${margins.top + chartHeight + 10})`)
         .style("font-size", "11px")
         .style("font-family", "Roboto")
         .call(bottomAxis);
 
-      let chartArea = svg2.append('g')
+      let chartArea = svg1.append('g')
         .attr('transform', `translate(${margins.left},${margins.top})`);
 
       let yearExtent = d3.extent(years)
@@ -162,17 +165,18 @@
       marginScale = d3.scaleLinear()
         .domain([0, 2])
         .range([30, margins.top - 50]);
+      
       // legend
       for (i = 0; i < 3; i++) {
         console.log(zoneColors[i]);
-        svg2.append('rect')
+        svg1.append('rect')
           .attr("x", width - 150)
           .attr("y", marginScale(i))
           .attr("width", 20)
           .attr("height", 20)
           .style("fill", zoneColors[i])
           .style("stroke", "black");
-        svg2.append('text')
+        svg1.append('text')
           .attr("x", width - 120)
           .attr("y", marginScale(i) + 10)
           .attr("dominant-baseline", "middle")
@@ -180,7 +184,7 @@
           .style("fill", "black")
           .style("font-family", "Courier")
           .style("font-size", 13);
-        svg2.append('circle')
+        svg1.append('circle')
           .attr('cx', width - 250)
           .attr('cy', marginScale(i) + 10)
           .attr('r', 10)
@@ -188,7 +192,7 @@
           .attr('opacity', 0.8)
           .attr('stroke', "darkred")
           .attr('stroke-width', 2)
-        svg2.append('text')
+        svg1.append('text')
           .attr("x", width - 230)
           .attr("y", marginScale(i) + 10)
           .attr("dominant-baseline", "middle")
@@ -197,27 +201,183 @@
           .style("font-family", "Courier")
           .style("font-size", 13);
       }
+
+      // x-axis labels
+      svg1.append("text").text("Annual Carbon Dioxide Emissions (tons per capita)")
+                        .attr("x", chartWidth / 2 + margins.left)
+                        .attr("y", 485).style("font-size", "15px")
+                        .attr("dominant-baseline", "middle")
+                        .attr("text-anchor", "middle");
+
+      // y-axis labels
+      svg1.append("text").text("Countries")
+                        .attr("x", -70)
+                        .attr("y", 185)
+                        .style("font-size", "15px")
+                        .attr("transform", "rotate(-90, 50, 200)");
+
+      //title
+      svg1.append("text").text("Carbon Dioxide Emissions Over Time")
+                        .attr("x", 25)
+                        .attr("y", 35)
+                        .style("font-size", "25px");
+
+      // caption
+      svg1.append("text").text("This graph shows the change in camrbon dioxide (CO2) emissions from 1960 to 2022 for 10 \ncountries. The graph is split into three sections, according to key data points derived from Enerdata’s projections. The green section represents the ideal emissions zone, which is between 0 - 2.3 tons CO2 emitted per capita. The yellow section represents the warning zone, which is between 2.3 - 6.3 tons per capita. Lastly, the red section represents the dangerous emissions zone, which is greater than 6.3 tons per capita. ")
+                        .attr("x", 35)
+                        .attr("y", 70)
+                        .style("font-size", "15px");
+
+      // visualization 2
+      const svg2 = d3.select('svg#graph2');
+      const width2 = svg2.attr('width');
+      const height2 = svg2.attr('height');
+      const margins2 = { top: 150, right: 250, bottom: 80, left: 105 };
+      const chartWidth2 = width2 - margins2.left - margins2.right;
+      const chartHeight2 = height2 - margins2.top - margins2.bottom;
+      
+      // appends svg
+      let chartArea2 = svg2.append('g')
+              .attr('transform', `translate(${margins2.left},${margins2.top})`);
+
+      chartArea2.append('rect')
+                .attr("x", -10)
+                .attr("y", -10)
+                .attr("width", chartWidth2+20)
+                .attr("height", chartHeight2+20)
+                .style("fill", "#d3d4d3")
+                .style("stroke", "black")
+            
+                
+      
+      d3.csv('change-death-rate.csv').then((data) => {
+        // filter data
+        data = data.filter((d) => {
+          return countries.includes(d['Entity']);
+        });
+        data.forEach((d, i) => {
+          d['Heat-related death rate'] = Number(d['Heat-related death rate']);
+        });
+        console.log(data);
+
+        // scales
+        const xScale = d3.scaleLinear().domain([2030, 2090])
+                                       .range([0, chartWidth2]);
+        const deathExtent = d3.extent(data, d => d['Heat-related death rate'])
+        const yScale = d3.scaleLinear().domain(deathExtent)
+                                       .range([chartHeight2, 0]);
+        const colorScale = d3.scaleOrdinal().domain(countries)
+                          .range(["hotpink","orange","gold","steelblue","blue","indigo","darkorchid","red","brown","darkgreen"])
+
+        // Axes
+        let leftAxis = d3.axisLeft(yScale).ticks(10);
+        svg2.append("g")
+            .attr("class", "y axis")
+            .attr("transform", `translate(${margins2.left - 10}, ${margins2.top})`)
+            .style("font-size", "13px")
+            .style("font-family", "Roboto")
+            .call(leftAxis);
+
+        let bottomAxis = d3.axisBottom(xScale).tickFormat(d3.format("")).ticks(5);
+        svg2.append("g")
+            .attr("class", "x axis")
+            .attr("transform", `translate(${margins2.left}, ${margins2.top + chartHeight2 + 10})`)
+            .style("font-size", "13px")
+            .style("font-family", "Roboto")
+            .call(bottomAxis);
+
+        // gridlines
+        let leftGridlines = d3.axisLeft(yScale)
+                              .tickSize(-chartWidth2-20)
+                              .tickFormat('');
+
+        svg2.append('g')
+            .attr('class', 'y gridlines')
+            .attr('transform',`translate(${margins2.left-10},${margins2.top})`)
+            .call(leftGridlines);
+
+            let chartArea2 = svg2.append('g')
+            .attr('transform', `translate(${margins2.left},${margins2.top})`);
+        // draw the lines
+        for (i=0; i<30; i=i+3) {
+          // 2030 - 2050 line
+          chartArea2.append("line")
+                    .attr("x1", xScale(data[i]['Year']))
+                    .attr("x2", xScale(data[i+1]['Year']))
+                    .attr("y1", yScale(data[i]['Heat-related death rate']))
+                    .attr("y2", yScale(data[i+1]['Heat-related death rate']))
+                    .style("stroke", colorScale(data[i]['Entity']))
+                    .style("stroke-width", 2);  
+          // 2050 - 2090 line
+          chartArea2.append("line")
+                    .attr("x1", xScale(data[i+1]['Year']))
+                    .attr("x2", xScale(data[i+2]['Year']))
+                    .attr("y1", yScale(data[i+1]['Heat-related death rate']))
+                    .attr("y2", yScale(data[i+2]['Heat-related death rate']))
+                    .style("stroke", colorScale(data[i]['Entity']))
+                    .style("stroke-width", 2); 
+        }
+
+        // plot data points
+        let circles = chartArea2.selectAll("circle").data(data)
+                                        .join("circle")
+                                        .attr("cx", d => xScale(d['Year']))
+                                        .attr("cy", d => yScale(d['Heat-related death rate']) )
+                                        .attr("r", 4)
+                                        .style("fill", d => colorScale(d['Entity']) )
+                                        .style("stroke", "black")
+                                        .style("stroke-width", 2);
+        
+        // legend
+        marginScale2 = d3.scaleLinear()
+                        .domain([0, 9])
+                        .range([margins2.top, (height2/2) - 100]);
+
+        for (i = 0; i < 30; i=i+3) {
+          svg2.append('rect')
+            .attr("x", width2 - 210)
+            .attr("y", marginScale2(i))
+            .attr("width", 20)
+            .attr("height", 20)
+            .style("fill", colorScale(data[i]['Entity']))
+            .style("stroke", "black");
+          svg2.append('text')
+            .attr("x", width2 - 180)
+            .attr("y", marginScale2(i) + 10)
+            .attr("dominant-baseline", "middle")
+            .text(data[i]['Entity'])
+            .style("fill", "black")
+            .style("font-family", "Courier")
+            .style("font-size", 13);
+        }
+
+        // x-axis labels
+        svg2.append("text").text("Years")
+            .attr("x", chartWidth2 / 2 + margins2.left)
+            .attr("y", height2 - 25).style("font-size", "17px")
+            .attr("dominant-baseline", "middle")
+            .attr("text-anchor", "middle");
+
+        // y-axis labels
+        svg2.append("text").text("Change in Heat-related Deaths (per 100,000)")
+            .attr("x", -330)
+            .attr("y", 185)
+            .style("font-size", "15px")
+            .attr("transform", "rotate(-90, 50, 200)");
+
+        //title
+        svg2.append("text").text("Projected Change in Heat-related Deaths from 2030 to 2090")
+            .attr("x", 25)
+            .attr("y", 35)
+            .style("font-size", "25px");
+        
+        // caption
+        svg2.append("text").text("This timeline shows the projected change in deaths due to non-optimal temperatures in 2030, 2050, and 2090 for the same countries represented in the emissions graph above, based on the Representative Concentration Pathway (RCP 4.5); this is a relatively moderate climate scenario wherein we reach approximately 2.5°C by 2100. Comparing the two graphs, we can see that countries with higher CO2 emissions per capita are likely to experience a greater rate of heat-related deaths. ")
+            .attr("x", 35)
+            .attr("y", 70)
+            .style("font-size", "15px");
+      })
     })
 
-
-
-
-
-    // x-axis labels
-    svg2.append("text").text("Annual Carbon Dioxide Emissions (tons per capita)").attr("x", chartWidth / 2).attr("y", 485).style("font-size", "15px");
-
-    // y-axis labels
-    svg2.append("text").text("Countries").attr("x", -70).attr("y", 185).style("font-size", "15px").attr("transform", "rotate(-90, 50, 200)");
-
-    //title
-    svg2.append("text").text("Carbon Dioxide Emissions Over Time").attr("x", 50).attr("y", 25).style("font-size", "17px");
-
-    // Legend
-
-
   </script>
-
-
-</body>
-
-</html>
+</body></html>
