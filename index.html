@@ -40,7 +40,7 @@
     const svg1 = d3.select('svg#graph1');
     const width = svg1.attr('width');
     const height = svg1.attr('height');
-    const margins = { top: 150, right: 40, bottom: 60, left: 140 };
+    const margins = { top: 180, right: 40, bottom: 60, left: 140 };
     const chartWidth = width - margins.left - margins.right;
     const chartHeight = height - margins.top - margins.bottom;
 
@@ -182,7 +182,7 @@
           .attr("dominant-baseline", "middle")
           .text(zones[i])
           .style("fill", "black")
-          .style("font-family", "Courier")
+          //.style("font-family", "Courier")
           .style("font-size", 13);
         svg1.append('circle')
           .attr('cx', width - 250)
@@ -198,8 +198,8 @@
           .attr("dominant-baseline", "middle")
           .text(years[i])
           .style("fill", "black")
-          .style("font-family", "Courier")
-          .style("font-size", 13);
+          //.style("font-family", "Courier")
+          .style("font-size", 14);
       }
 
       // x-axis labels
@@ -223,16 +223,32 @@
                         .style("font-size", "25px");
 
       // caption
-      svg1.append("text").text("This graph shows the change in camrbon dioxide (CO2) emissions from 1960 to 2022 for 10 \ncountries. The graph is split into three sections, according to key data points derived from Enerdata’s projections. The green section represents the ideal emissions zone, which is between 0 - 2.3 tons CO2 emitted per capita. The yellow section represents the warning zone, which is between 2.3 - 6.3 tons per capita. Lastly, the red section represents the dangerous emissions zone, which is greater than 6.3 tons per capita. ")
+      svg1.append("text").text("This graph shows the change in carbon dioxide (CO2) emissions from 1960 to 2022 for 10 countries. The graph")
                         .attr("x", 35)
                         .attr("y", 70)
-                        .style("font-size", "15px");
+                        .style("font-size", "13px");
+      svg1.append("text").text("is split into three sections, according to key data points derived from Enerdata's projections. The green section ")
+                        .attr("x", 35)
+                        .attr("y", 90)
+                        .style("font-size", "13px");
+      svg1.append("text").text("represents the ideal emissions zone, which is between 0 - 2.3 tons CO2 emitted per capita. The yellow section ")
+                        .attr("x", 35)
+                        .attr("y", 110)
+                        .style("font-size", "13px");
+      svg1.append("text").text("represents the warning zone, which is between 2.3 - 6.3 tons per capita. Lastly, the red section represents the")
+                        .attr("x", 35)
+                        .attr("y", 130)
+                        .style("font-size", "13px");
+      svg1.append("text").text("dangerous emissions zone, which is greater than 6.3 tons per capita.")
+                        .attr("x", 35)
+                        .attr("y", 150)
+                        .style("font-size", "13px");
 
       // visualization 2
       const svg2 = d3.select('svg#graph2');
       const width2 = svg2.attr('width');
       const height2 = svg2.attr('height');
-      const margins2 = { top: 150, right: 250, bottom: 80, left: 105 };
+      const margins2 = { top: 160, right: 250, bottom: 80, left: 105 };
       const chartWidth2 = width2 - margins2.left - margins2.right;
       const chartHeight2 = height2 - margins2.top - margins2.bottom;
       
@@ -347,7 +363,7 @@
             .attr("dominant-baseline", "middle")
             .text(data[i]['Entity'])
             .style("fill", "black")
-            .style("font-family", "Courier")
+            //.style("font-family", "Courier")
             .style("font-size", 13);
         }
 
@@ -372,10 +388,25 @@
             .style("font-size", "25px");
         
         // caption
-        svg2.append("text").text("This timeline shows the projected change in deaths due to non-optimal temperatures in 2030, 2050, and 2090 for the same countries represented in the emissions graph above, based on the Representative Concentration Pathway (RCP 4.5); this is a relatively moderate climate scenario wherein we reach approximately 2.5°C by 2100. Comparing the two graphs, we can see that countries with higher CO2 emissions per capita are likely to experience a greater rate of heat-related deaths. ")
+        svg2.append("text").text("This timeline shows the projected change in deaths due to non-optimal temperatures in 2030, 2050, and 2090 for the same countries represented in the")
             .attr("x", 35)
             .attr("y", 70)
-            .style("font-size", "15px");
+            .style("font-size", "13px");
+        //   
+        svg2.append("text").text("emissions graph above, based on the Representative Concentration Pathway (RCP 4.5); this is a relatively moderate climate scenario where global ")
+            .attr("x", 35)
+            .attr("y", 90)
+            .style("font-size", "13px");
+        //
+        svg2.append("text").text("temperatures increase by approximately 2.5 C by 2100. Comparing the two graphs, we can see that countries with higher CO2 emissions per capita ")
+            .attr("x", 35)
+            .attr("y", 110)
+            .style("font-size", "13px");
+        //
+        svg2.append("text").text("are likely to experience a greater rate of heat-related deaths.")
+            .attr("x", 35)
+            .attr("y", 130)
+            .style("font-size", "13px");
       })
     })
 
