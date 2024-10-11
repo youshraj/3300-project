@@ -130,8 +130,8 @@
         .attr('transform', `translate(${margins.left},${margins.top})`);
 
       let yearExtent = d3.extent(years)
-      let colorScale = d3.scaleLinear().domain(yearExtent)
-        .range([d3.rgb("#FCF55F"), d3.rgb("#ff0000")])
+      let colorScale = d3.scaleLinear().domain([1960, 2000, 2022])
+        .range([d3.rgb("#7F00FF"), d3.rgb("#FFA500"), d3.rgb("#ff0000")])
         .interpolate(d3.interpolateHcl);
 
       // lines connecting data points
